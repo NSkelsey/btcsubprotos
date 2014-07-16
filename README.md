@@ -1,4 +1,4 @@
 btcsubprotos
 ============
 
-Constants for Bitcoin protocols. Right now: ahimsa and CounterParty
+Constants for Bitcoin protocols. Right now: ahimsa, DocProof and CounterParty
