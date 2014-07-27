@@ -47,7 +47,7 @@ func matchFirstOut(tx *btcwire.MsgTx, magic []byte) bool {
 	if err != nil {
 		return false
 	}
-	if len(outdata) > 0 {
+	if len(outdata[0]) > len(magic) {
 		firstpush := outdata[0]
 		if bytes.Equal(firstpush[:len(magic)], magic) {
 			return true
