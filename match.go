@@ -10,7 +10,7 @@ import (
 func IsBulletin(tx *btcwire.MsgTx) bool {
 	// Takes a TX and determines if it is an ahimsa bulletin.
 	magic := Ahimsa.Magic
-	return matchFirstOut(tx, magic)
+	return matchFirstOut(tx, magic) && len(tx.TxOut) > 1
 }
 
 func IsCounterParty(tx *btcwire.MsgTx) bool {

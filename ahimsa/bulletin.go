@@ -22,8 +22,8 @@ var (
 type Author string
 
 type Bulletin struct {
-	txid    *btcwire.ShaHash
-	block   *btcwire.ShaHash
+	Txid    *btcwire.ShaHash
+	Block   *btcwire.ShaHash
 	Author  string
 	Topic   string
 	Message string
@@ -61,6 +61,14 @@ func extractData(txOuts []*btcwire.TxOut) ([]byte, error) {
 		}
 
 	}
+	// trim trailing zeros
+	for j := len(alldata) - 1; j > 0; j-- {
+		b := alldata[j]
+		if b != 0x00 {
+			alldata = alldata[:j+1]
+			break
+		}
+	}
 	return alldata, nil
 }
 
@@ -70,20 +78,32 @@ func NewBulletin(tx *btcwire.MsgTx, author string, blkhash *btcwire.ShaHash) (*B
 	// unpack txOuts that are considered data, We are going to ignore extra junk at the end of data
 	wireBltn := &protocol.WireBulletin{}
 
-	bytes, err := extractData(tx.TxOut)
-	if err != nil {
-		return nil, err
-	}
+	// Bootleg solution, but if unmarshal fails slice txout and try again until we can no more or it fails
+	var err error
+	for j := len(tx.TxOut); j > 1; j-- {
+		rel_txouts := tx.TxOut[:j] // slice off change txouts
+		err = *new(error)
+		bytes, err := extractData(rel_txouts)
+		if err != nil {
+			continue
+		}
 
-	err = proto.Unmarshal(bytes, wireBltn)
+		err = proto.Unmarshal(bytes, wireBltn)
+		if err != nil {
+			continue
+		} else {
+			// No errors, we found a good decode
+			break
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 
 	hash, _ := tx.TxSha()
 	bltn := &Bulletin{
-		txid:    &hash,
-		block:   blkhash,
+		Txid:    &hash,
+		Block:   blkhash,
 		Author:  author,
 		Topic:   wireBltn.GetTopic(),
 		Message: wireBltn.GetMessage(),
