@@ -1,15 +1,14 @@
 package btcsubprotos
 
+import "github.com/NSkelsey/protocol/ahimsa"
+
 type Params struct {
 	Magic []byte // Magic bytes associated with some protocol
-
 }
 
 var (
 	Ahimsa Params = Params{
-		Magic: []byte{
-			0x42, 0x52, 0x45, 0x54, 0x48, 0x52, 0x45, 0x4e, /* | BRETHREN | */
-		},
+		Magic: ahimsa.Magic[:],
 	}
 	CounterParty Params = Params{
 		Magic: []byte{
