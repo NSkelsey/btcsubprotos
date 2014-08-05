@@ -41,13 +41,16 @@ func IsCounterParty(tx *btcwire.MsgTx) bool {
 
 func matchFirstOut(tx *btcwire.MsgTx, magic []byte) bool {
 	// Tests to see if the first txout in the tx matches the magic bytes.
+	if len(tx.TxOut) == 0 {
+		return false
+	}
 	firstOutScript := tx.TxOut[0].PkScript
 
 	outdata, err := btcscript.PushedData(firstOutScript)
 	if err != nil {
 		return false
 	}
-	if len(outdata[0]) > len(magic) {
+	if len(outdata) > 0 && len(outdata[0]) > len(magic) {
 		firstpush := outdata[0]
 		if bytes.Equal(firstpush[:len(magic)], magic) {
 			return true
