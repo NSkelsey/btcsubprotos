@@ -7,14 +7,16 @@ import (
 	"github.com/conformal/btcwire"
 )
 
+// Takes a TX and determines if it is an ahimsa bulletin.
+// This method only looks for the leading bytes, it does not
+// assert anything about the protocol buffer within.
 func IsBulletin(tx *btcwire.MsgTx) bool {
-	// Takes a TX and determines if it is an ahimsa bulletin.
 	magic := Ahimsa.Magic
 	return matchFirstOut(tx, magic) && len(tx.TxOut) > 1
 }
 
+// Tries to match pushed data to the counterparty format
 func IsCounterParty(tx *btcwire.MsgTx) bool {
-	// Tries to match pushed data to the counterparty format
 	magic := CounterParty.Magic
 
 	for _, txout := range tx.TxOut {
@@ -39,8 +41,8 @@ func IsCounterParty(tx *btcwire.MsgTx) bool {
 	return false
 }
 
+// Tests to see if the first txout in the tx matches the magic bytes.
 func matchFirstOut(tx *btcwire.MsgTx, magic []byte) bool {
-	// Tests to see if the first txout in the tx matches the magic bytes.
 	if len(tx.TxOut) == 0 {
 		return false
 	}
@@ -59,8 +61,8 @@ func matchFirstOut(tx *btcwire.MsgTx, magic []byte) bool {
 	return false
 }
 
+// Checks to see if tx is a docproof message by looking at its first output.
 func IsDocProof(tx *btcwire.MsgTx) bool {
-	// Checks to see if tx is a docproof message by looking at its first output.
 	magic := DocProof.Magic
 	return matchFirstOut(tx, magic)
 }
